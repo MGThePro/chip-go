@@ -124,7 +124,7 @@ func op_1xxx() {
 func op_2xxx() {
 	sp++
 	stack[sp] = pc
-	pc = opcode & 0x0FFF
+	pc = (opcode & 0x0FFF) - 2
 }
 
 func op_3xkk() {
