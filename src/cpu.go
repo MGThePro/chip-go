@@ -34,42 +34,44 @@ var fontSet = [80]uint8{
 	0xF0, 0x80, 0xF0, 0x80, 0x80,
 }
 
-var funcMap = map[uint16]func(){
-	0x0000: op_0xxx,
-	0x00E0: op_00E0,
-	0x00EE: op_00EE,
-	0x1000: op_1xxx,
-	0x2000: op_2xxx,
-	0x3000: op_3xkk,
-	0x4000: op_4xkk,
-	0x5000: op_5xy0,
-	0x6000: op_6xkk,
-	0x7000: op_7xkk,
-	0x8000: op_8xy0,
-	0x8001: op_8xy1,
-	0x8002: op_8xy2,
-	0x8003: op_8xy3,
-	0x8004: op_8xy4,
-	0x8005: op_8xy5,
-	0x8006: op_8xy6,
-	0x8007: op_8xy7,
-	0x800E: op_8xyE,
-	0x9000: op_9xy0,
-	0xA000: op_Annn,
-	0xB000: op_Bnnn,
-	0xC000: op_Cxkk,
-	0xD000: op_Dxyn,
-	0xE09E: op_Ex9E,
-	0xE0A1: op_ExA1,
-	0xF007: op_Fx07,
-	0xF00A: op_Fx0A,
-	0xF015: op_Fx15,
-	0xF018: op_Fx18,
-	0xF01E: op_Fx1E,
-	0xF029: op_Fx29,
-	0xF033: op_Fx33,
-	0xF055: op_Fx55,
-	0xF065: op_Fx65,
+var funcArray [61542]func()
+
+func loadFuncs() {
+	funcArray[0x0000] = op_0xxx
+	funcArray[0x00E0] = op_00E0
+	funcArray[0x00EE] = op_00EE
+	funcArray[0x1000] = op_1xxx
+	funcArray[0x2000] = op_2xxx
+	funcArray[0x3000] = op_3xkk
+	funcArray[0x4000] = op_4xkk
+	funcArray[0x5000] = op_5xy0
+	funcArray[0x6000] = op_6xkk
+	funcArray[0x7000] = op_7xkk
+	funcArray[0x8000] = op_8xy0
+	funcArray[0x8001] = op_8xy1
+	funcArray[0x8002] = op_8xy2
+	funcArray[0x8003] = op_8xy3
+	funcArray[0x8004] = op_8xy4
+	funcArray[0x8005] = op_8xy5
+	funcArray[0x8006] = op_8xy6
+	funcArray[0x8007] = op_8xy7
+	funcArray[0x800E] = op_8xyE
+	funcArray[0x9000] = op_9xy0
+	funcArray[0xA000] = op_Annn
+	funcArray[0xB000] = op_Bnnn
+	funcArray[0xC000] = op_Cxkk
+	funcArray[0xD000] = op_Dxyn
+	funcArray[0xE09E] = op_Ex9E
+	funcArray[0xE0A1] = op_ExA1
+	funcArray[0xF007] = op_Fx07
+	funcArray[0xF00A] = op_Fx0A
+	funcArray[0xF015] = op_Fx15
+	funcArray[0xF018] = op_Fx18
+	funcArray[0xF01E] = op_Fx1E
+	funcArray[0xF029] = op_Fx29
+	funcArray[0xF033] = op_Fx33
+	funcArray[0xF055] = op_Fx55
+	funcArray[0xF065] = op_Fx65
 }
 
 func fetch() {
@@ -93,8 +95,8 @@ func execute() {
 	if opcode >= 0xE000 {
 		parsedOpcode = opcode & 0xF0FF
 	}
-	if funcMap[parsedOpcode] != nil {
-		funcMap[parsedOpcode]()
+	if funcArray[parsedOpcode] != nil {
+		funcArray[parsedOpcode]()
 	}
 }
 

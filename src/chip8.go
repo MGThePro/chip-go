@@ -10,6 +10,7 @@ import (
 func main() {
 	loadGame()
 	loadFont()
+	loadFuncs()
 	pixelgl.Run(run)
 }
 
