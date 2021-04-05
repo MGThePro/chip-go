@@ -11,11 +11,11 @@ var memory [4096]uint8
 var V [16]uint8
 var stack [16]uint16
 var sp uint16
-var delay_timer uint8
-var sound_timer uint8
+var delayTimer uint8
+var soundTimer uint8
 var key [16]uint8
 var framebuffer [64][32]uint8
-var fontset = [80]uint8{
+var fontSet = [80]uint8{
 	0xF0, 0x90, 0x90, 0x90, 0xF0,
 	0x20, 0x60, 0x20, 0x20, 0x70,
 	0xF0, 0x10, 0xF0, 0x80, 0xF0,
@@ -34,7 +34,7 @@ var fontset = [80]uint8{
 	0xF0, 0x80, 0xF0, 0x80, 0x80,
 }
 
-var funcmap = map[uint16]func(){
+var funcMap = map[uint16]func(){
 	0x0000: op_0xxx,
 	0x00E0: op_00E0,
 	0x00EE: op_00EE,
@@ -93,8 +93,8 @@ func execute() {
 	if opcode >= 0xE000 {
 		parsedOpcode = opcode & 0xF0FF
 	}
-	if funcmap[parsedOpcode] != nil {
-		funcmap[parsedOpcode]()
+	if funcMap[parsedOpcode] != nil {
+		funcMap[parsedOpcode]()
 	}
 }
 
@@ -260,25 +260,25 @@ func op_Cxkk() {
 func op_Dxyn() {
 	x := (opcode & 0x0F00) >> 8
 	y := (opcode & 0x00F0) >> 4
-	n := (opcode & 0x000F)
+	n := opcode & 0x000F
 	V[0xF] = 0
-	startx := V[x] % 63
-	starty := V[y] % 31
+	startX := V[x] % 63
+	startY := V[y] % 31
 	for row := 0; uint16(row) < n; row++ {
-		if uint8(row)+starty > 31 {
+		if uint8(row)+startY > 31 {
 			break
 		}
 		spriteByte := memory[I+uint16(row)]
 		for col := 0; col < 8; col++ {
-			if uint8(col)+startx > 63 {
+			if uint8(col)+startX > 63 {
 				break
 			}
 			spritePixel := spriteByte & (0x80 >> col)
-			screenPixel := framebuffer[startx+uint8(col)][starty+uint8(row)]
+			screenPixel := framebuffer[startX+uint8(col)][startY+uint8(row)]
 			if spritePixel > 0 && screenPixel > 0 {
 				V[0xF] = 1
 			}
-			framebuffer[startx+uint8(col)][starty+uint8(row)] = screenPixel ^ spritePixel
+			framebuffer[startX+uint8(col)][startY+uint8(row)] = screenPixel ^ spritePixel
 		}
 	}
 }
@@ -299,7 +299,7 @@ func op_ExA1() {
 
 func op_Fx07() {
 	x := (opcode & 0x0F00) >> 8
-	V[x] = delay_timer
+	V[x] = delayTimer
 }
 
 func op_Fx0A() {
@@ -315,12 +315,12 @@ func op_Fx0A() {
 
 func op_Fx15() {
 	x := (opcode & 0x0F00) >> 8
-	delay_timer = V[x]
+	delayTimer = V[x]
 }
 
 func op_Fx18() {
 	x := (opcode & 0x0F00) >> 8
-	sound_timer = V[x]
+	soundTimer = V[x]
 }
 
 func op_Fx1E() {
