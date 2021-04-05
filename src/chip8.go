@@ -31,15 +31,15 @@ func loadFont() {
 
 func drawFramebuffer(imd *imdraw.IMDraw) {
 	imd.Color = pixel.RGB(1, 1, 1)
-	for y := 31; y >= 0; y-- {
-		for x := 63; x >= 0; x-- {
+	for y := 0; y < 32; y++ {
+		for x := 0; x < 64; x++ {
 			if framebuffer[x][y] > 0 {
 				imd.Color = pixel.RGB(1, 1, 1)
 			} else {
 				imd.Color = pixel.RGB(0, 0, 0)
 			}
-			imd.Push(pixel.V(float64(x*10), float64(320-y*10)))
-			imd.Push(pixel.V(float64((x*10)+10), float64((320-y*10)+10)))
+			imd.Push(pixel.V(float64(x*10), float64(310-y*10)))
+			imd.Push(pixel.V(float64((x*10)+10), float64((310-y*10)+10)))
 			imd.Rectangle(0)
 		}
 	}
