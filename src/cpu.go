@@ -208,19 +208,19 @@ func op_8xy5() {
 	} else {
 		V[0xF] = 0
 	}
-	V[x] = V[x] - V[y]
+	V[x] -= V[y]
 }
 
 func op_8xy6() {
 	x := (opcode & 0x0F00) >> 8
-	V[0xF] = uint8(x & 0x01)
+	V[0xF] = uint8(x & 0x0001)
 	V[x] = V[x] >> 1
 }
 
 func op_8xy7() {
 	x := (opcode & 0x0F00) >> 8
 	y := (opcode & 0x00F0) >> 4
-	if V[x] < V[y] {
+	if V[x] <= V[y] {
 		V[0xF] = 1
 	} else {
 		V[0xF] = 0
@@ -237,7 +237,7 @@ func op_8xyE() {
 func op_9xy0() {
 	x := (opcode & 0x0F00) >> 8
 	y := (opcode & 0x00F0) >> 4
-	if V[x] > V[y] {
+	if V[x] != V[y] {
 		pc += 2
 	}
 }
@@ -287,14 +287,14 @@ func op_Dxyn() {
 
 func op_Ex9E() {
 	x := (opcode & 0x0F00) >> 8
-	if key[x] == 1 {
+	if key[V[x]] == 1 {
 		pc += 2
 	}
 }
 
 func op_ExA1() {
 	x := (opcode & 0x0F00) >> 8
-	if key[x] != 1 {
+	if key[V[x]] != 1 {
 		pc += 2
 	}
 }
@@ -345,13 +345,15 @@ func op_Fx33() {
 func op_Fx55() {
 	x := (opcode & 0x0F00) >> 8
 	for i := 0; uint16(i) <= x; i++ {
-		memory[I+uint16(i)] = V[i]
+		memory[I] = V[i]
+		I++
 	}
 }
 
 func op_Fx65() {
 	x := (opcode & 0x0F00) >> 8
 	for i := 0; uint16(i) <= x; i++ {
-		V[i] = memory[I+uint16(i)]
+		V[i] = memory[I]
+		I++
 	}
 }
