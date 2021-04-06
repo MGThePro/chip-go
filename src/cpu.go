@@ -95,13 +95,15 @@ func execute() {
 	if opcode >= 0xE000 {
 		parsedOpcode = opcode & 0xF0FF
 	}
-	if funcArray[parsedOpcode] != nil {
+	if parsedOpcode <= 0xF065 && funcArray[parsedOpcode] != nil {
 		funcArray[parsedOpcode]()
 	}
 }
 
 func op_0xxx() {
 	nnn := opcode & 0x0FFF
+	sp++
+	stack[sp] = pc
 	pc = nnn - 2
 }
 
@@ -203,7 +205,7 @@ func op_8xy4() {
 func op_8xy5() {
 	x := (opcode & 0x0F00) >> 8
 	y := (opcode & 0x00F0) >> 4
-	if V[x] > V[y] {
+	if V[x] >= V[y] {
 		V[0xF] = 1
 	} else {
 		V[0xF] = 0
@@ -213,7 +215,7 @@ func op_8xy5() {
 
 func op_8xy6() {
 	x := (opcode & 0x0F00) >> 8
-	V[0xF] = uint8(x & 0x0001)
+	V[0xF] = V[x] & 0x01
 	V[x] = V[x] >> 1
 }
 
