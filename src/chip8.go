@@ -2,8 +2,9 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"image"
+	"image/color"
 	"os"
 )
 
@@ -29,21 +30,18 @@ func loadFont() {
 		memory[i] = fontSet[i]
 	}
 }
-
-func drawFramebuffer(imd *imdraw.IMDraw) {
-	imd.Color = pixel.RGB(1, 1, 1)
+func frame() *image.RGBA {
+	m := image.NewRGBA(image.Rect(0, 0, 64, 32))
 	for y := 0; y < 32; y++ {
 		for x := 0; x < 64; x++ {
 			if framebuffer[x][y] > 0 {
-				imd.Color = pixel.RGB(1, 1, 1)
+				m.Set(x, y, color.White)
 			} else {
-				imd.Color = pixel.RGB(0, 0, 0)
+				m.Set(x, y, color.Black)
 			}
-			imd.Push(pixel.V(float64(x*10), float64(310-y*10)))
-			imd.Push(pixel.V(float64((x*10)+10), float64((310-y*10)+10)))
-			imd.Rectangle(0)
 		}
 	}
+	return m
 }
 
 func pollInput(win *pixelgl.Window) {
@@ -155,9 +153,9 @@ func run() {
 		if delayTimer > 0 {
 			delayTimer--
 		}
-		imd := imdraw.New(nil)
-		drawFramebuffer(imd)
-		imd.Draw(win)
+		p := pixel.PictureDataFromImage(frame())
+		c := win.Bounds().Center()
+		pixel.NewSprite(p, p.Bounds()).Draw(win, pixel.IM.Moved(c).Scaled(c, 10.0))
 		win.Update()
 	}
 }
