@@ -129,9 +129,10 @@ func pollInput(win *pixelgl.Window) {
 
 func run() {
 	cfg := pixelgl.WindowConfig{
-		Title:  "Chip-go",
-		Bounds: pixel.R(0, 0, 640, 320),
-		VSync:  true,
+		Title:     "Chip-go",
+		Bounds:    pixel.R(0, 0, 640, 320),
+		VSync:     true,
+		Resizable: true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
 	if err != nil {
@@ -153,9 +154,16 @@ func run() {
 		if delayTimer > 0 {
 			delayTimer--
 		}
+		win.Clear(color.Black)
 		p := pixel.PictureDataFromImage(frame())
 		c := win.Bounds().Center()
-		pixel.NewSprite(p, p.Bounds()).Draw(win, pixel.IM.Moved(c).Scaled(c, 10.0))
+		var windowScale float64
+		if win.Bounds().H()/32 > win.Bounds().W()/64 {
+			windowScale = win.Bounds().W() / 64
+		} else {
+			windowScale = win.Bounds().H() / 32
+		}
+		pixel.NewSprite(p, p.Bounds()).Draw(win, pixel.IM.Moved(c).Scaled(c, windowScale))
 		win.Update()
 	}
 }
