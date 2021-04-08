@@ -76,6 +76,9 @@ func loadFuncs() {
 
 func fetch() {
 	opcode = uint16(memory[pc])<<8 | uint16(memory[pc+1])
+	//fmt.Printf("opcode: %x ",opcode)
+	//fmt.Printf("PC: %x ",pc)
+	//fmt.Printf("Index: %d\n",I)
 }
 
 func execute() {
@@ -176,30 +179,31 @@ func op_8xy0() {
 func op_8xy1() {
 	x := (opcode & 0x0F00) >> 8
 	y := (opcode & 0x00F0) >> 4
-	V[x] = V[x] | V[y]
+	V[x] |= V[y]
 }
 
 func op_8xy2() {
 	x := (opcode & 0x0F00) >> 8
 	y := (opcode & 0x00F0) >> 4
-	V[x] = V[x] & V[y]
+	V[x] &= V[y]
 }
 
 func op_8xy3() {
 	x := (opcode & 0x0F00) >> 8
 	y := (opcode & 0x00F0) >> 4
-	V[x] = V[x] ^ V[y]
+	V[x] ^= V[y]
 }
 
 func op_8xy4() {
 	x := (opcode & 0x0F00) >> 8
 	y := (opcode & 0x00F0) >> 4
-	if uint16(V[x])+uint16(V[y]) > 255 {
+	sum := uint16(V[x]) + uint16(V[y])
+	if sum > 255 {
 		V[0xF] = 1
 	} else {
 		V[0xF] = 0
 	}
-	V[x] = V[x] + V[y]
+	V[x] = uint8(sum)
 }
 
 func op_8xy5() {
@@ -296,7 +300,7 @@ func op_Ex9E() {
 
 func op_ExA1() {
 	x := (opcode & 0x0F00) >> 8
-	if key[V[x]] != 1 {
+	if key[V[x]] == 0 {
 		pc += 2
 	}
 }
@@ -329,7 +333,7 @@ func op_Fx18() {
 
 func op_Fx1E() {
 	x := (opcode & 0x0F00) >> 8
-	I = I + x
+	I = I + uint16(V[x])
 }
 
 func op_Fx29() {
@@ -339,23 +343,24 @@ func op_Fx29() {
 
 func op_Fx33() {
 	x := (opcode & 0x0F00) >> 8
-	memory[I] = (V[x] - (V[x] % 100)) / 100
-	memory[I+1] = (V[x] - (V[x] % 10) - (memory[I] * 100)) / 10
-	memory[I+2] = V[x] - (memory[I] * 100) - (memory[I+1] * 10)
+	value := V[x]
+	memory[I+2] = value % 10
+	value /= 10
+	memory[I+1] = value % 10
+	value /= 10
+	memory[I] = value % 10
 }
 
 func op_Fx55() {
 	x := (opcode & 0x0F00) >> 8
 	for i := 0; uint16(i) <= x; i++ {
-		memory[I] = V[i]
-		I++
+		memory[I+uint16(i)] = V[i]
 	}
 }
 
 func op_Fx65() {
 	x := (opcode & 0x0F00) >> 8
 	for i := 0; uint16(i) <= x; i++ {
-		V[i] = memory[I]
-		I++
+		V[i] = memory[I+uint16(i)]
 	}
 }
